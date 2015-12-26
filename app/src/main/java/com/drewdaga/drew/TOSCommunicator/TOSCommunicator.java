@@ -45,27 +45,25 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
     private static int CAMERA_WIDTH = 480;
     private static int CAMERA_HEIGHT = 800;
     private static float CAMERA_ACTUAL_OVER_BASE = 1;
-    private Sound mSoundClick, mSoundSpockFascinating, mPhotonTorpedo, mSoundLiveLongAndProsper, mSoundStun, mSoundTribble, mSoundNeedYou, mSoundCommChirp;//, mSoundBeamMeAboard;
+    private Sound mSoundComputerBeep, mSoundClick, mSoundSpockFascinating, mPhotonTorpedo, mSoundLiveLongAndProsper, mSoundStun, mSoundTribble, mSoundNeedYou, mSoundCommChirp;//, mSoundBeamMeAboard;
     private Music mSpockCaptainJim, mSoundBeamMeAboard;
     private ITextureRegion mCircleThingTR, mPanelTR, mSecurityButtonTR, mCommandButtonTR, mMedicalButtonTR, mSecurityLightOffTR, mSecurityLightOnTR, mMedicalLightOffTR, mMedicalLightOnTR, mCommandLightOffTR, mCommandLightOnTR, mBackgroundTR;
     private ITiledTextureRegion mCommandLightTTR;
-    private static String mFilenameSecurityOne = null;
+    private static String mFilenameSecurityOne, mFilenameMedicalOne, mFilenameCommandOne, mFilenameMedicalTwo, mFilenameCommandTwo,
+            mFilenameSecurityTwo, mFilenameCommandThree, mFilenameSecurityThree, mFilenameMedicalThree = null;
     private Sprite medicalLightOnSprite, securityLightOnSprite, commandLightOnSprite;
     private MediaRecorder mRecorder = null;
     private MediaPlayer mPlayer = null;
+
     private enum ModeType {
         SOUNDBOARD_MODE, RECORDER_PLAYBACK_MODE, RECORDER_RECORD_MODE
     }
 
     private Boolean mIsRecording = false;
-
-    //    private AtomicBoolean isBusy;
-//    private AtomicInteger numFlickers;
     private final int TOTAL_LEDS = 3;
 
     //Set the current mode
     private ModeType itsCurrentMode = ModeType.SOUNDBOARD_MODE;
-//	private Light commandLightSprite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,10 +80,8 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         int cameraHeight = 0;
         if (point.x < point.y) {
             cameraWidth = point.x;
-            //cameraHeight = point.y;
         } else {
             cameraWidth = point.y;
-            //cameraHeight = point.x;
         }
         cameraHeight = cameraWidth * CAMERA_BASE_HEIGHT / CAMERA_BASE_WIDTH;
         CAMERA_ACTUAL_OVER_BASE = ((float) cameraHeight) / ((float) CAMERA_BASE_HEIGHT);
@@ -209,7 +205,6 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
             this.mCommandLightOnTR = TextureRegionFactory.extractFromTexture(commandLightOnTexture);
             this.mSecurityLightOffTR = TextureRegionFactory.extractFromTexture(securityLightOffTexture);
             this.mSecurityLightOnTR = TextureRegionFactory.extractFromTexture(securityLightOnTexture);
-            //this.mCommandLightTTR = TextureRegionFactory.
 
 
         } catch (IOException e) {
@@ -217,6 +212,9 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         }
 
         try {
+            mSoundComputerBeep = SoundFactory.createSoundFromAsset(this.getSoundManager(), this.getApplicationContext(),
+                    "aud/click.wav");
+
             mSoundClick = SoundFactory.createSoundFromAsset(this.getSoundManager(), this.getApplicationContext(),
                     "aud/click.wav");
 
@@ -256,21 +254,58 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         mFilenameSecurityOne = Environment.getExternalStorageDirectory().getAbsolutePath();
         mFilenameSecurityOne += "/TOSSecurityOne.3gp";
 
+        mFilenameMedicalOne = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameMedicalOne += "/TOSMedicalOne.3gp";
+
+        mFilenameCommandOne = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameCommandOne += "/TOSCommandOne.3gp";
+
+        mFilenameSecurityTwo = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameSecurityTwo += "/TOSSecurityTwo.3gp";
+
+        mFilenameMedicalTwo = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameMedicalTwo += "/TOSMedicalTwo.3gp";
+
+        mFilenameCommandTwo = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameCommandTwo += "/TOSCommandTwo.3gp";
+
+        mFilenameSecurityThree = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameSecurityThree += "/TOSSecurityThree.3gp";
+
+        mFilenameMedicalThree = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameMedicalThree += "/TOSMedicalThree.3gp";
+
+        mFilenameCommandThree = Environment.getExternalStorageDirectory().getAbsolutePath();
+        mFilenameCommandThree += "/TOSCommandThree.3gp";
 
     }
 
     @Override
     protected Scene onCreateScene() {
         final Scene scene = new Scene();
-        scene.getBackground().setColor(Color.BLACK);
+        //scene.getBackground().setColor(Color.BLACK);
+
+        //Set up the background
         Sprite backgroundSprite = new Sprite(0, 0, this.mBackgroundTR, getVertexBufferObjectManager());
 
-//        isBusy.set(false);
-        //numFlickers.set(0);
+        //Set up the panel of mode switch buttons
+        Sprite panelSprite = new Sprite(CAMERA_WIDTH * 3 / 18, CAMERA_HEIGHT * 19 / 60, this.mPanelTR, getVertexBufferObjectManager());
 
+        //Set up the sprite for the speaker thing
+        Sprite circleThingSprite = new Sprite(CAMERA_WIDTH * 3 / 9, CAMERA_HEIGHT * 1 / 30, this.mCircleThingTR, getVertexBufferObjectManager());
+
+        //Setup the LEDs
         securityLightOnSprite = new Sprite(CAMERA_WIDTH * 4 / 18, CAMERA_HEIGHT * 7 / 30, this.mSecurityLightOnTR, getVertexBufferObjectManager());
         medicalLightOnSprite = new Sprite(CAMERA_WIDTH * 8 / 18, CAMERA_HEIGHT * 7 / 30, this.mMedicalLightOnTR, getVertexBufferObjectManager());
         commandLightOnSprite = new Sprite(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 7 / 30, this.mCommandLightOnTR, getVertexBufferObjectManager());
+
+        Sprite commandLightOffSprite = new Sprite(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 7 / 30, this.mCommandLightOffTR, getVertexBufferObjectManager());
+        Sprite medicalLightOffSprite = new Sprite(CAMERA_WIDTH * 8 / 18, CAMERA_HEIGHT * 7 / 30, this.mMedicalLightOffTR, getVertexBufferObjectManager());
+        Sprite securityLightOffSprite = new Sprite(CAMERA_WIDTH * 4 / 18, CAMERA_HEIGHT * 7 / 30, this.mSecurityLightOffTR, getVertexBufferObjectManager());
+
+        commandLightOnSprite.setVisible(false);
+        medicalLightOnSprite.setVisible(false);
+        securityLightOnSprite.setVisible(false);
 
         //Set up the mode switch buttons
         Button recordButton = new Button(CAMERA_WIDTH * 2 / 18, CAMERA_HEIGHT * 9 / 30, this.mSecurityButtonTR, getVertexBufferObjectManager()) {
@@ -291,7 +326,7 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
             }
         };
 
-
+        //Soundboard button setup
         Button soundboardButton = new Button(CAMERA_WIDTH * 7 / 18, CAMERA_HEIGHT * 9 / 30, this.mMedicalButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
@@ -312,12 +347,17 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
 
         };
 
+        //Record playback button
         Button playbackButton = new Button(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 9 / 30, this.mCommandButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
                 boolean retValue = false;
 
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
+                    if (mIsRecording) {
+                        //Stop recording - the filename doesn't matter
+                        recorderRecord(mFilenameSecurityThree);
+                    }
                     itsCurrentMode = ModeType.RECORDER_PLAYBACK_MODE;
                     resetLights(commandLightOnSprite);
                     resetLights(medicalLightOnSprite);
@@ -331,15 +371,9 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
 
         };
 
-        Sprite commandLightOffSprite = new Sprite(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 7 / 30, this.mCommandLightOffTR, getVertexBufferObjectManager());
-        Sprite medicalLightOffSprite = new Sprite(CAMERA_WIDTH * 8 / 18, CAMERA_HEIGHT * 7 / 30, this.mMedicalLightOffTR, getVertexBufferObjectManager());
-        Sprite securityLightOffSprite = new Sprite(CAMERA_WIDTH * 4 / 18, CAMERA_HEIGHT * 7 / 30, this.mSecurityLightOffTR, getVertexBufferObjectManager());
-        commandLightOnSprite.setVisible(false);
-        medicalLightOnSprite.setVisible(false);
-        securityLightOnSprite.setVisible(false);
-        Sprite circleThingSprite = new Sprite(CAMERA_WIDTH * 3 / 9, CAMERA_HEIGHT * 1 / 30, this.mCircleThingTR, getVertexBufferObjectManager());
+        //Set up the 9 buttons
 
-
+        //First red button
         Button securityButton1Sprite = new Button(CAMERA_WIDTH * 2 / 18, CAMERA_HEIGHT * 14 / 30, this.mSecurityButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
@@ -357,53 +391,13 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
 
                         }
                         case RECORDER_PLAYBACK_MODE: {
-                            mSoundClick.play();
-                            if (mPlayer == null) {
-                                mPlayer = new MediaPlayer();
-                                try {
-                                    mPlayer.setDataSource(mFilenameSecurityOne);
-                                    mPlayer.prepare();
-                                    mPlayer.start();
-                                    playbackBlinkLED();
-                                    //mPlayer.release();
-                                } catch (IOException e) {
-                                    Log.e(LOG_TAG, "prepare() failed");
-                                }
-                                retValue = true;
-                            }
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameSecurityOne);
                             break;
                         }
                         case RECORDER_RECORD_MODE: {
-                            mSoundClick.play();
-                            if(mIsRecording)
-                            {
-                                mIsRecording = false;
-                                mRecorder.stop();
-                                mRecorder.release();
-                                mRecorder = null;
-                            }
-                            else
-                            {
-                                mIsRecording = true;
-                                mRecorder = new MediaRecorder();
-                                mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                                mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                                mRecorder.setOutputFile(mFilenameSecurityOne);
-                                mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-                                try {
-                                    mRecorder.prepare();
-                                } catch (IOException e) {
-                                    Log.e(LOG_TAG, "prepare() failed");
-                                }
-
-                                mRecorder.start();
-
-                                recordBlinkLED();
-
-
-                            }
-                            retValue = true;
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameSecurityOne);
                             break;
                         }
                         default: {
@@ -419,198 +413,359 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
             }
 
         };
+
+        //First blue button
         Button medicalButton1Sprite = new Button(CAMERA_WIDTH * 7 / 18, CAMERA_HEIGHT * 14 / 30, this.mMedicalButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSoundLiveLongAndProsper.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
-                    flickerLights(securityLightOnSprite, 5);
-                    flickerLights(medicalLightOnSprite, 6);
-                    flickerLights(commandLightOnSprite, 7);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSoundLiveLongAndProsper.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            flickerLights(securityLightOnSprite, 5);
+                            flickerLights(medicalLightOnSprite, 6);
+                            flickerLights(commandLightOnSprite, 7);
+                            retValue = true;
+                            break;
+
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameMedicalOne);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameMedicalOne);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
+
+                return retValue;
             }
 
-
         };
+
+        //First yellow button
         Button commandButton1Sprite = new Button(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 14 / 30, this.mCommandButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSoundCommChirp.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSoundCommChirp.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            retValue = true;
+                            break;
+
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameCommandOne);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameCommandOne);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
-            }
 
+                return retValue;
+            }
 
         };
 
+        //Second red button
         Button securityButton2Sprite = new Button(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 19 / 30, this.mSecurityButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mPhotonTorpedo.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mPhotonTorpedo.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            retValue = true;
+                            break;
+
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameSecurityTwo);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameSecurityTwo);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
-            }
 
+                return retValue;
+            }
 
         };
 
+        //second blue button
         Button medicalButton2Sprite = new Button(CAMERA_WIDTH * 2 / 18, CAMERA_HEIGHT * 19 / 30, this.mMedicalButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSpockCaptainJim.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
-                    flickerLights(securityLightOnSprite, 30);
-                    flickerLights(medicalLightOnSprite, 31);
-                    flickerLights(commandLightOnSprite, 32);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSpockCaptainJim.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            flickerLights(securityLightOnSprite, 30);
+                            flickerLights(medicalLightOnSprite, 31);
+                            flickerLights(commandLightOnSprite, 32);
+                            retValue = true;
+                            break;
 
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameMedicalTwo);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameMedicalTwo);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
+
+                return retValue;
             }
 
-
         };
+
+        //Second yellow button
         Button commandButton2Sprite = new Button(CAMERA_WIDTH * 7 / 18, CAMERA_HEIGHT * 19 / 30, this.mCommandButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSoundNeedYou.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
-//					flickerLights(securityLightOnSprite, 10);
-//					flickerLights(medicalLightOnSprite, 11);
-//					flickerLights(commandLightOnSprite, 12);
-                    flickerLights(securityLightOnSprite, 12);
-                    flickerLights(medicalLightOnSprite, 13);
-                    flickerLights(commandLightOnSprite, 14);
-//					flickerLights(securityLightOnSprite, 20);
-//					flickerLights(medicalLightOnSprite, 21);
-//					flickerLights(commandLightOnSprite, 22);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSoundNeedYou.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            flickerLights(securityLightOnSprite, 12);
+                            flickerLights(medicalLightOnSprite, 13);
+                            flickerLights(commandLightOnSprite, 14);
+                            retValue = true;
+                            break;
+
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameCommandTwo);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameCommandTwo);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
-            }
 
+                return retValue;
+            }
 
         };
 
+        //Third red button
         Button securityButton3Sprite = new Button(CAMERA_WIDTH * 7 / 18, CAMERA_HEIGHT * 24 / 30, this.mSecurityButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSoundTribble.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
-//					flickerLights(securityLightOnSprite, 10);
-//					flickerLights(medicalLightOnSprite, 11);
-//					flickerLights(commandLightOnSprite, 12);
-                    flickerLights(securityLightOnSprite, 15);
-                    flickerLights(medicalLightOnSprite, 16);
-                    flickerLights(commandLightOnSprite, 17);
-                    flickerLights(securityLightOnSprite, 30);
-                    flickerLights(medicalLightOnSprite, 31);
-                    flickerLights(commandLightOnSprite, 32);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSoundTribble.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            flickerLights(securityLightOnSprite, 15);
+                            flickerLights(medicalLightOnSprite, 16);
+                            flickerLights(commandLightOnSprite, 17);
+                            flickerLights(securityLightOnSprite, 30);
+                            flickerLights(medicalLightOnSprite, 31);
+                            flickerLights(commandLightOnSprite, 32);
+                            retValue = true;
+                            break;
+
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameSecurityThree);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameSecurityThree);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
+
+                return retValue;
             }
 
-
         };
+
+        //Third blue button
         Button medicalButton3Sprite = new Button(CAMERA_WIDTH * 12 / 18, CAMERA_HEIGHT * 24 / 30, this.mMedicalButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSoundSpockFascinating.play();
-                    flickerLights(securityLightOnSprite, 0);
-                    flickerLights(medicalLightOnSprite, 1);
-                    flickerLights(commandLightOnSprite, 2);
 
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSoundSpockFascinating.play();
+                            flickerLights(securityLightOnSprite, 0);
+                            flickerLights(medicalLightOnSprite, 1);
+                            flickerLights(commandLightOnSprite, 2);
+                            retValue = true;
+                            break;
+
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameMedicalThree);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameMedicalThree);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
+
+                return retValue;
             }
 
-
         };
+
+        //Third yellow button
         Button commandButton3Sprite = new Button(CAMERA_WIDTH * 2 / 18, CAMERA_HEIGHT * 24 / 30, this.mCommandButtonTR, getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
 
+                boolean retValue = false;
                 if (pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP) {
-                    mSoundBeamMeAboard.play();
-                    flickerLights(securityLightOnSprite, 3);
-                    flickerLights(medicalLightOnSprite, 4);
-                    flickerLights(commandLightOnSprite, 5);
 
-//					flickerLights(securityLightOnSprite, 13);
-//					flickerLights(medicalLightOnSprite, 14);
-//					flickerLights(commandLightOnSprite, 15);
+                    switch (itsCurrentMode) {
+                        case SOUNDBOARD_MODE: {
+                            mSoundBeamMeAboard.play();
+                            flickerLights(securityLightOnSprite, 3);
+                            flickerLights(medicalLightOnSprite, 4);
+                            flickerLights(commandLightOnSprite, 5);
+                            retValue = true;
+                            break;
 
-
+                        }
+                        case RECORDER_PLAYBACK_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderPlayback(mFilenameCommandThree);
+                            break;
+                        }
+                        case RECORDER_RECORD_MODE: {
+                            mSoundComputerBeep.play();
+                            retValue = recorderRecord(mFilenameCommandThree);
+                            break;
+                        }
+                        default: {
+                            retValue = false;
+                            break;
+                        }
+                    }
+                } else {
+                    retValue = true;
                 }
-                return true;
+
+                return retValue;
             }
 
-
         };
 
-
-        Sprite panelSprite = new Sprite(CAMERA_WIDTH * 3 / 18, CAMERA_HEIGHT * 19 / 60, this.mPanelTR, getVertexBufferObjectManager()) {
-//            @Override
-//            public boolean onAreaTouched(TouchEvent pSceneTouchEvent, float pTouchAreaLocalX, float pTouchAreaLocalY) {
-//                if ((pSceneTouchEvent.getAction() == TouchEvent.ACTION_UP)) {//&&
-////                        ( !isBusy.get() )) {
-//
-//                    switch (itsCurrentMode) {
-//                        case SOUNDBOARD_MODE: {
-//                            itsCurrentMode = ModeType.RECORDER_RECORD_MODE;
-//                            break;
-//                        }
-//                        case RECORDER_RECORD_MODE: {
-//                            itsCurrentMode = ModeType.RECORDER_PLAYBACK_MODE;
-//                            break;
-//                        }
-//                        case RECORDER_PLAYBACK_MODE: {
-//                            itsCurrentMode = ModeType.SOUNDBOARD_MODE;
-//                            break;
-//                        }
-//                    }
-//                    resetLights(commandLightOnSprite);
-//                    resetLights(medicalLightOnSprite);
-//                    resetLights(securityLightOnSprite);
-//                    mSoundClick.play();
-//                }
-//                return true;
-//            }
-        };
-
+        //Setup the sizes
         backgroundSprite.setSize(CAMERA_WIDTH * 18 / 18, CAMERA_HEIGHT * 30 / 30);
 
         securityLightOnSprite.setSize(CAMERA_WIDTH * 2 / 18, CAMERA_HEIGHT * 2 / 30);
@@ -639,7 +794,8 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         commandButton3Sprite.setSize(CAMERA_WIDTH * 4 / 18, CAMERA_HEIGHT * 4 / 30);
 
         float test = panelSprite.getHeight();
-        //panelSprite.setS
+
+        //Attach all the sprites to the scene
         scene.attachChild(backgroundSprite);
         scene.attachChild(panelSprite);
         scene.attachChild(circleThingSprite);
@@ -662,7 +818,7 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         scene.attachChild(soundboardButton);
         scene.attachChild(playbackButton);
 
-
+        //Register touchable areas for mode buttons and sound buttons
         scene.registerTouchArea(commandButton1Sprite);
         scene.registerTouchArea(commandButton2Sprite);
         scene.registerTouchArea(commandButton3Sprite);
@@ -676,20 +832,16 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         scene.registerTouchArea(soundboardButton);
         scene.registerTouchArea(playbackButton);
 
+        //Hide the buttons to switch modes
         recordButton.setVisible(false);
         soundboardButton.setVisible(false);
         playbackButton.setVisible(false);
-
-        //scene.registerTouchArea(panelSprite);
 
         return scene;
     }
 
     protected Boolean flickerLights(final Sprite pLightSprite, final int pOffset) {
         Boolean returnStatus = false;
-        //isBusy.set(true);
-        //int currentLEDFlickerCount = numFlickers.get();
-        //numFlickers.set(currentLEDFlickerCount+1);
 
         float i = 0.2f;
         //Flicker the lights 2 times //- on off - on off
@@ -708,22 +860,13 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 mEngine.unregisterUpdateHandler(pTimerHandler);
                 resetLights(pLightSprite);
-//                int currentLEDFlickerCount = numFlickers.get();
-//                if(currentLEDFlickerCount > 0) {
-//                    numFlickers.set(currentLEDFlickerCount - 1);
-//                }
-//
-//                if(numFlickers.get() == 0)
-//                {
-//                    isBusy.set(false);
-//                }
-//
             }
         }));
 
         return returnStatus;
     }
 
+    //Put the leds back to the correct configuration for the current mode
     protected Boolean resetLights(final Sprite pLightSprite) {
         Boolean retVal = false;
 
@@ -759,6 +902,8 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         return retVal;
 
     }
+
+    //Blink the playback LED while the recorded sound is playing
     protected Boolean playbackBlinkLED() {
         Boolean retVal = false;
         //Flicker the lights once in half a second
@@ -770,15 +915,13 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
                 commandLightOnSprite.setVisible(currentLEDState);
                 //If still playing
                 if (mPlayer.isPlaying()) {
-                        //Blink it again in a bit
-                        playbackBlinkLED();
-                }
-                else
-                {
+                    //Blink it again in a bit
+                    playbackBlinkLED();
+                } else {
                     //Put the LEDs back the way they should be
                     resetLights(commandLightOnSprite);
 
-                   //Release the resources
+                    //Release the resources
                     mPlayer.release();
                     mPlayer = null;
 
@@ -789,29 +932,93 @@ public class TOSCommunicator extends SimpleBaseGameActivity {
         return retVal;
     }
 
+    //Blink the record LED while a recording is in progress
     protected Boolean recordBlinkLED() {
         Boolean retVal = false;
         //Flicker the lights once in half a second
-            mEngine.registerUpdateHandler(new TimerHandler(0.5f, new ITimerCallback() {
-                public void onTimePassed(final TimerHandler pTimerHandler) {
-                    mEngine.unregisterUpdateHandler(pTimerHandler);
-                    boolean currentLEDState = securityLightOnSprite.isVisible();
-                    currentLEDState = currentLEDState ^ true;
-                    securityLightOnSprite.setVisible(currentLEDState);
-                    //If still recording
-                    if(mIsRecording)
-                    {
-                        //Blink it again in a bit
-                        recordBlinkLED();
-                    }
-                    else
-                    {
-                        //Put the LEDs back the way they should be
-                        resetLights(securityLightOnSprite);
-                    }
+        mEngine.registerUpdateHandler(new TimerHandler(0.5f, new ITimerCallback() {
+            public void onTimePassed(final TimerHandler pTimerHandler) {
+                mEngine.unregisterUpdateHandler(pTimerHandler);
+                boolean currentLEDState = securityLightOnSprite.isVisible();
+                currentLEDState = currentLEDState ^ true;
+                securityLightOnSprite.setVisible(currentLEDState);
+                //If still recording
+                if (mIsRecording) {
+                    //Blink it again in a bit
+                    recordBlinkLED();
+                } else {
+                    //Put the LEDs back the way they should be
+                    resetLights(securityLightOnSprite);
                 }
-            }));
+            }
+        }));
 
         return retVal;
+    }
+
+    //playback the previously recorded clip
+    protected Boolean recorderPlayback(String pFilename) {
+        Boolean retValue = false;
+
+        //If it isn't currently playing
+        if (mPlayer == null) {
+            mPlayer = new MediaPlayer();
+            try {
+                mPlayer.setDataSource(pFilename);
+                mPlayer.prepare();
+                mPlayer.start();
+
+                //start blinking the playback led
+                playbackBlinkLED();
+
+            //if the playback fails
+            } catch (IOException e) {
+                mPlayer = null;
+                ///print a log message
+                Log.e(LOG_TAG, "prepare() failed");
+            }
+            retValue = true;
+        }
+        return retValue;
+    }
+
+    //record a clip with the corresponding filename
+    protected Boolean recorderRecord(String pFilename) {
+        Boolean retValue = false;
+
+        //If it is already recording
+        if (mIsRecording) {
+            //stop recording the current clip
+            mIsRecording = false;
+            mRecorder.stop();
+            mRecorder.release();
+            mRecorder = null;
+        }
+
+        //otherwise start recording
+        else {
+            mIsRecording = true;
+            mRecorder = new MediaRecorder();
+            mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mRecorder.setOutputFile(pFilename);
+            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+            //if preparing the recorder fails
+            try {
+                mRecorder.prepare();
+            } catch (IOException e) {
+                //log the error
+                Log.e(LOG_TAG, "prepare() failed");
+            }
+
+            mRecorder.start();
+
+            //Begin blinking the record LED
+            recordBlinkLED();
+
+        }
+        retValue = true;
+        return retValue;
     }
 }
